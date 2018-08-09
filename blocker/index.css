@@ -1,0 +1,99 @@
+/* disable all selection */
+
+:not(input):not(textarea),
+:not(input):not(textarea)::after,
+:not(input):not(textarea)::before {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: none;
+}
+
+input,
+button,
+textarea,
+:focus {
+  outline: none;
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  color: #ddd;
+  cursor: none;
+}
+
+#out {
+  padding: 0 30px;
+  margin: 0;
+  font-size: 40vh;
+  box-sizing: border-box;
+  line-height: 1.4;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#notice {
+  transition: opacity 10s ease-out;
+}
+
+p {
+  text-align: center;
+  font-size: 3vh;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+#tip._1 span:nth-child(-n + 1) {
+  opacity: 0.5;
+}
+
+#tip._2 span:nth-child(-n + 2) {
+  opacity: 0.5;
+}
+
+#tip._3 span:nth-child(-n + 3) {
+  opacity: 0.5;
+}
+
+#tip._4 span:nth-child(-n + 4) {
+  opacity: 0.5;
+}
+
+#tip._5 span:nth-child(-n + 5) {
+  opacity: 0.5;
+}
+
+#tip._6 span:nth-child(-n + 6) {
+  opacity: 0.5;
+}
+
+#tip._7 span:nth-child(-n + 7) {
+  opacity: 0.5;
+}
+
+#tip._8 span:nth-child(-n + 8) {
+  opacity: 0.5;
+}
+
+#tip._9 span:nth-child(-n + 9) {
+  opacity: 0.5;
+}
+
+#tip._10 span:nth-child(-n + 10) {
+  opacity: 0.5;
+}

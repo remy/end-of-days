@@ -1,0 +1,33 @@
+{
+  "name": "endofdays",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "engines": {
+    "node": "10.x"
+  },
+  "config": {
+    "prod": true
+  },
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dev": "nodemon -x 'npm start' -i ./renderer"
+  },
+  "build": {
+    "appId": "com.electron.endofdays",
+    "extraResources": ["assets/*"],
+    "productName": "End Of Days",
+    "mac": {
+      "category": "public.app-category.productivity"
+    }
+  },
+  "keywords": [],
+  "author": "Remy Sharp",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^2.0.6",
+    "electron-builder": "^20.27.1"
+  }
+}
