@@ -5,7 +5,6 @@ const prod = !require('../is-dev');
 let canQuit = false;
 
 app.on('can-quit', (value = true) => {
-  console.log('I can quit', value);
   canQuit = value;
 });
 
@@ -18,7 +17,6 @@ module.exports = function createWindow() {
     show: false,
     backgroundColor: '#000',
     alwaysOnTop: prod,
-    // skipTaskbar: true,
     closable: false,
     movable: false,
     resizable: false,
@@ -28,16 +26,15 @@ module.exports = function createWindow() {
   });
 
   mainWindow.setMenu(null);
-
-  // and load the index.html of the app.
   mainWindow.loadFile(__dirname + '/index.html');
   mainWindow.setSimpleFullScreen(true);
 
   canQuit = false;
 
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
-  });
+  mainWindow.once('ready-to-show', () => mainWindow.show());
+
+  // prevent blurring when we're open
+  mainWindow.on('blur', () => mainWindow.focus());
 
   // Emitted when the window is closed.
   mainWindow.on('closed', e => {

@@ -14,12 +14,17 @@ const activeIcon = nativeImage.createFromPath(
 );
 activeIcon.setTemplateImage(true);
 
+let dismissTimeout = 1;
 let tray = null;
 let blockerWindow = null;
 let due = '22:00';
 
+function updateTimeout(menuItem) {
+  dismissTimeout = menuItem.value;
+}
+
 function startBlocker() {
-  app.dock.show();
+  app.dock.show(); // allows the blocker to be completely fullscreen
   blockerWindow = blocker();
 }
 
@@ -62,14 +67,14 @@ setInterval(() => {
   if (time >= due && !blockerWindow) {
     startBlocker();
   }
-}, 1000 * 60);
+}, 1000 * 30);
 
 // closing closes for 20 minutes
 app.on('close-blocker', () => {
   closeBlocker();
   let now = Date.now();
-  now += 1000 * 60 * 20;
-  due = getTime(now);
+  now += 1000 * 60 * dismissTimeout;
+  due = getTime(new Date(now));
 });
 
 module.exports = function createTray() {
@@ -84,12 +89,20 @@ module.exports = function createTray() {
     },
     { label: 'About', role: 'about' },
     { type: 'separator' },
+    { label: 'Dismiss timeout', enabled: false },
     {
-      label: 'Quit end of days',
-      click: () => {
-        // closeBlocker();
-        app.quit();
-      },
+      type: 'radio',
+      label: '1 minute',
+      checked: true,
+      click: updateTimeout,
+      value: 1,
+    },
+    { type: 'radio', label: '2 minutes', click: updateTimeout, value: 2 },
+    { type: 'radio', label: '5 minutes', click: updateTimeout, value: 5 },
+    { type: 'separator' },
+    {
+      label: 'Quit',
+      click: () => app.quit(),
     },
   ]);
   tray.setToolTip('This is my application.');
