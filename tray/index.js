@@ -17,6 +17,7 @@ activeIcon.setTemplateImage(true);
 let dismissTimeout = 1;
 let tray = null;
 let blockerWindow = null;
+let contextMenu = null;
 let due = '22:00';
 
 function updateTimeout(menuItem) {
@@ -24,6 +25,7 @@ function updateTimeout(menuItem) {
 }
 
 function startBlocker() {
+  tray.setImage(activeIcon);
   app.dock.show(); // allows the blocker to be completely fullscreen
   blockerWindow = blocker();
 }
@@ -72,18 +74,26 @@ setInterval(() => {
 // closing closes for 20 minutes
 app.on('close-blocker', () => {
   closeBlocker();
-  let now = Date.now();
-  now += 1000 * 60 * dismissTimeout;
-  due = getTime(new Date(now));
+  let now = new Date();
+  const hour = now.getHours();
+
+  // only add a snooze if we're bedtime
+  if (hour >= 22) {
+    due = getTime(new Date(now.getTime() + 1000 * 60 * dismissTimeout));
+    updateMenu();
+  }
 });
 
-module.exports = function createTray() {
-  tray = new Tray(idleIcon);
-  const contextMenu = Menu.buildFromTemplate([
+function updateMenu() {
+  if (!tray) return;
+
+  tray.setToolTip(`Bedtime @ ${due}`);
+
+  contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Bedtime',
+      id: '1',
+      label: `Bedtime @ ${due}`,
       click: () => {
-        tray.setImage(activeIcon);
         startBlocker();
       },
     },
@@ -93,18 +103,34 @@ module.exports = function createTray() {
     {
       type: 'radio',
       label: '1 minute',
-      checked: true,
+      checked: dismissTimeout === 1,
       click: updateTimeout,
       value: 1,
     },
-    { type: 'radio', label: '2 minutes', click: updateTimeout, value: 2 },
-    { type: 'radio', label: '5 minutes', click: updateTimeout, value: 5 },
+    {
+      type: 'radio',
+      label: '2 minutes',
+      checked: dismissTimeout === 2,
+      click: updateTimeout,
+      value: 2,
+    },
+    {
+      type: 'radio',
+      label: '5 minutes',
+      checked: dismissTimeout === 5,
+      click: updateTimeout,
+      value: 5,
+    },
     { type: 'separator' },
     {
       label: 'Quit',
       click: () => app.quit(),
     },
   ]);
-  tray.setToolTip('This is my application.');
   tray.setContextMenu(contextMenu);
+}
+
+module.exports = function createTray() {
+  tray = new Tray(idleIcon);
+  updateMenu();
 };

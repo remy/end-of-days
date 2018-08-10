@@ -1,6 +1,6 @@
 {
   "name": "endofdays",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "main.js",
   "engines": {
@@ -13,6 +13,7 @@
     "start": "electron .",
     "package": "electron-builder --dir",
     "dist": "electron-builder",
+    "release": "build",
     "dev": "nodemon -x 'npm start' -i ./renderer"
   },
   "build": {
