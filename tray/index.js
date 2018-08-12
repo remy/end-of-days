@@ -1,4 +1,5 @@
-const { app, Menu, Tray, nativeImage } = require('electron');
+const electron = require('electron');
+const { app, Menu, Tray, nativeImage } = electron;
 const blocker = require('../blocker/index');
 const path = require('path');
 
@@ -50,7 +51,7 @@ function getTime(d) {
     .padStart(2, '0')}`;
 }
 
-setInterval(() => {
+const check = () => {
   const now = new Date();
   const hour = now.getHours();
   const time = getTime(now);
@@ -61,7 +62,7 @@ setInterval(() => {
     tray.setImage(idleIcon);
   }
 
-  if (hour < 4 && blockerWindow) {
+  if (time < due && blockerWindow) {
     due = '22:00'; // reset time
     return closeBlocker();
   }
@@ -69,7 +70,9 @@ setInterval(() => {
   if (time >= due && !blockerWindow) {
     startBlocker();
   }
-}, 1000 * 30);
+};
+
+setInterval(check, 1000 * 30);
 
 // closing closes for 20 minutes
 app.on('close-blocker', () => {
@@ -133,4 +136,5 @@ function updateMenu() {
 module.exports = function createTray() {
   tray = new Tray(idleIcon);
   updateMenu();
+  electron.powerMonitor.on('resume', check);
 };
