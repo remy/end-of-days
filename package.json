@@ -12,23 +12,50 @@
   "scripts": {
     "start": "electron .",
     "package": "electron-builder --dir",
-    "dist": "electron-builder",
+    "dist": "build",
+    "build": "sh scripts/build.sh",
     "release": "build",
     "dev": "nodemon -x 'npm start' -i ./renderer"
   },
   "build": {
-    "appId": "com.electron.endofdays",
-    "extraResources": ["assets/*"],
-    "productName": "End Of Days",
+    "appId": "com.remysharp.end-of-days",
+    "productName": "End of Days",
     "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "pkg",
+        "dmg",
+        "zip",
+        "mas"
+      ],
+      "entitlements": "build/entitlements.mac.plist",
+      "type": "distribution",
+      "icon": "build/icon.icns"
+    },
+    "mas": {
+      "entitlements": "build/entitlements.mas.plist",
+      "type": "distribution",
       "category": "public.app-category.productivity"
-    }
+    },
+    "files": [
+      "main.js",
+      "node_modules/**/*",
+      "app/**/*",
+      "package.json",
+      "embedded.provisionprofile"
+    ]
   },
   "keywords": [],
   "author": "Remy Sharp",
-  "license": "MIT",
+  "license": "ISC",
   "devDependencies": {
     "electron": "^2.0.6",
-    "electron-builder": "^20.27.1"
+    "electron-builder": "^20.27.1",
+    "electron-installer-dmg": "^2.0.0",
+    "electron-packager": "^12.1.0"
+  },
+  "dependencies": {
+    "make-dir": "^1.3.0",
+    "write-file-atomic": "^2.3.0"
   }
 }

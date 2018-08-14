@@ -2,6 +2,11 @@ const electron = require('electron');
 const { app, Menu, Tray, nativeImage } = electron;
 const blocker = require('../blocker/index');
 const path = require('path');
+const Config = require('../config');
+const config = new Config({
+  due: '22:00', // TODO make configurable
+  dismissTimeout: 1,
+});
 
 app.dock.hide();
 
@@ -15,20 +20,23 @@ const activeIcon = nativeImage.createFromPath(
 );
 activeIcon.setTemplateImage(true);
 
-let dismissTimeout = 1;
+let { dismissTimeout, due } = config.store;
+
 let tray = null;
 let blockerWindow = null;
 let contextMenu = null;
-let due = '22:00';
 
 function updateTimeout(menuItem) {
   dismissTimeout = menuItem.value;
+  config.set({ dismissTimeout });
 }
 
 function startBlocker() {
   tray.setImage(activeIcon);
   app.dock.show(); // allows the blocker to be completely fullscreen
+  // setTimeout(() => {
   blockerWindow = blocker();
+  // }, 100);
 }
 
 function closeBlocker() {
@@ -38,6 +46,7 @@ function closeBlocker() {
     blockerWindow.destroy();
     blockerWindow = null;
     tray.setImage(idleIcon);
+    updateMenu();
   }
 }
 
@@ -63,7 +72,7 @@ const check = () => {
   }
 
   if (time < due && blockerWindow) {
-    due = '22:00'; // reset time
+    due = config.due; // reset time
     return closeBlocker();
   }
 
@@ -76,15 +85,14 @@ setInterval(check, 1000 * 30);
 
 // closing closes for 20 minutes
 app.on('close-blocker', () => {
-  closeBlocker();
   let now = new Date();
-  const hour = now.getHours();
+  const time = getTime(now);
 
   // only add a snooze if we're bedtime
-  if (hour >= 22) {
+  if (time > config.due) {
     due = getTime(new Date(now.getTime() + 1000 * 60 * dismissTimeout));
-    updateMenu();
   }
+  closeBlocker();
 });
 
 function updateMenu() {
@@ -96,11 +104,9 @@ function updateMenu() {
     {
       id: '1',
       label: `Bedtime @ ${due}`,
-      click: () => {
-        startBlocker();
-      },
+      click: startBlocker,
     },
-    { label: 'About', role: 'about' },
+    // { label: 'About', role: 'about' },
     { type: 'separator' },
     { label: 'Dismiss timeout', enabled: false },
     {
@@ -126,8 +132,9 @@ function updateMenu() {
     },
     { type: 'separator' },
     {
-      label: 'Quit',
-      click: () => app.quit(),
+      label: 'Quit End of Days',
+      accelerator: 'cmd+q',
+      role: 'quit',
     },
   ]);
   tray.setContextMenu(contextMenu);
@@ -136,5 +143,6 @@ function updateMenu() {
 module.exports = function createTray() {
   tray = new Tray(idleIcon);
   updateMenu();
+  check();
   electron.powerMonitor.on('resume', check);
 };
